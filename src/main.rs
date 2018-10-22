@@ -20,20 +20,35 @@ fn main() {
 
 mod perlin_noise {
     pub struct PerlinNoise1D {
-        seed: [u8; 32],
+        base_seed: [u8; 32],
         iterations: u32,
         gradient_distance: f64,
         amplitude: f64,
         periodic: bool,
-        num_gradients: u32
+        num_gradients: u32,
+        output_size: f64
     }
 
     impl PerlinNoise1D {
         pub fn new(seed: [u8; 32], iterations: u32, gradient_distance: f64, amplitude: f64, num_gradients: u32) -> PerlinNoise1D {
-            PerlinNoise1D { seed, iterations, gradient_distance, amplitude, periodic: num_gradients == 0, num_gradients }
+            PerlinNoise1D {
+                base_seed: seed,
+                iterations,
+                gradient_distance,
+                amplitude,
+                periodic: num_gradients != 0,
+                num_gradients,
+                output_size: gradient_distance * num_gradients
+            }
         }
 
-        pub fn perlin_noise_1d(&self, x: f64) -> f64 {
+        pub fn perlin_noise_1d(&self, mut x: f64) -> f64 {
+            if self.periodic {
+                x = x % self.output_size;
+            }
+            let gradient_index0 = (x / self.gradient_distance) as i32;
+            let gradient_index1 = (gradient_index0 + 1) % self.num_gradients;
+
             0.0
         }
     }
