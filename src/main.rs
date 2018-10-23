@@ -63,5 +63,9 @@ mod perlin_noise {
             }
             sum
         }
+
+        fn perlin_noise_1d_recurse(&self, x: f64, iter: ) -> f64 {
+
+        }
     }
 }
