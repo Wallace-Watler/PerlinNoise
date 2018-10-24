@@ -44,9 +44,13 @@ mod perlin_noise {
         }
 
         pub fn perlin_noise_1d(&self, x: f64) -> f64 {
-            let fade = |t: f64| -> f64 { t.powi(3) * (6.0 * t*t - 15.0 * t + 10.0) };
-            let gradient_distance = |iter: u32| -> f64 { self.base_gradient_distance / (2 as f64).powi(iter as i32) };
+            let gradient_distance = self.base_gradient_distance / (1 << 0);
+            let frac_x = x % gradient_distance;
             0.0
+        }
+
+        fn fade(t: f64) -> f64 {
+            t.powi(3) * (6.0 * t*t - 15.0 * t + 10.0)
         }
 
         fn gradient_indices(&self, x: f64, gradient_distance: f64) -> (i32, i32) {
