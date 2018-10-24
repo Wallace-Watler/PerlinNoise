@@ -31,12 +31,12 @@ mod perlin_noise {
     }
 
     impl PerlinNoise1D {
-        pub fn new(seed: u64, iterations: u32, gradient_distance: f64, amplitude: f64, num_gradients: u32) -> PerlinNoise1D {
+        pub fn new(seed: u64, iterations: u32, gradient_distance: f64, max_amplitude: f64, num_gradients: u32) -> PerlinNoise1D {
             PerlinNoise1D {
                 base_seed: seed,
                 iterations,
                 base_gradient_distance: gradient_distance,
-                max_amplitude: amplitude,
+                max_amplitude,
                 periodic: num_gradients != 0,
                 num_gradients,
                 output_size: gradient_distance * num_gradients as f64
@@ -44,16 +44,9 @@ mod perlin_noise {
         }
 
         pub fn perlin_noise_1d(&self, x: f64) -> f64 {
-            let mut result = 0.0;
-            for iter in 0..self.iterations {
-                let gradient_distance = self.gradient_distance(iter);
-                let (gradient_index0, gradient_index1) = self.gradient_indices(x, gradient_distance);
-            }
-            result
-        }
-
-        fn gradient_distance(&self, iter: u32) -> f64 {
-            self.base_gradient_distance / 2^iter
+            let fade = |t: f64| -> f64 { t.powi(3) * (6.0 * t*t - 15.0 * t + 10.0) };
+            let gradient_distance = |iter: u32| -> f64 { self.base_gradient_distance / (2 as f64).powi(iter as i32) };
+            0.0
         }
 
         fn gradient_indices(&self, x: f64, gradient_distance: f64) -> (i32, i32) {
