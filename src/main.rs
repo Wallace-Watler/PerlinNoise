@@ -17,14 +17,14 @@ fn main() {
 }
 
 mod perlin_noise {
-    use rand::rngs;
+    use rand::rngs::StdRng;
     use rand::SeedableRng;
 
     pub struct PerlinNoise1D {
         base_seed: u64,
         iterations: u32,
-        gradient_distance: f64,
-        amplitude: f64,
+        base_gradient_distance: f64,
+        max_amplitude: f64,
         periodic: bool,
         num_gradients: u32,
         output_size: f64
@@ -35,8 +35,8 @@ mod perlin_noise {
             PerlinNoise1D {
                 base_seed: seed,
                 iterations,
-                gradient_distance,
-                amplitude,
+                base_gradient_distance: gradient_distance,
+                max_amplitude: amplitude,
                 periodic: num_gradients != 0,
                 num_gradients,
                 output_size: gradient_distance * num_gradients as f64
@@ -44,28 +44,29 @@ mod perlin_noise {
         }
 
         pub fn perlin_noise_1d(&self, x: f64) -> f64 {
-            let (gradient_index0, gradient_index1) = match self.periodic {
+            let mut result = 0.0;
+            for iter in 0..self.iterations {
+                let gradient_distance = self.gradient_distance(iter);
+                let (gradient_index0, gradient_index1) = self.gradient_indices(x, gradient_distance);
+            }
+            result
+        }
+
+        fn gradient_distance(&self, iter: u32) -> f64 {
+            self.base_gradient_distance / 2^iter
+        }
+
+        fn gradient_indices(&self, x: f64, gradient_distance: f64) -> (i32, i32) {
+            match self.periodic {
                 true => {
-                    let index0 = ((x % self.output_size) / self.gradient_distance) as i32;
+                    let index0 = ((x % self.output_size) / gradient_distance) as i32;
                     (index0, (index0 + 1) % self.num_gradients as i32)
                 },
                 false => {
-                    let index0 = (x / self.gradient_distance) as i32;
+                    let index0 = (x / gradient_distance) as i32;
                     (index0, index0 + 1)
                 }
-            };
-
-            let base_rng = rngs::StdRng::seed_from_u64(self.base_seed);
-
-            let mut sum = 0.0;
-            for iter in 2..(self.iterations + 2) {
-
             }
-            sum
-        }
-
-        fn perlin_noise_1d_recurse(&self, x: f64, iter: ) -> f64 {
-
         }
     }
 }
